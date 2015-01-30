@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.util.LinkedList;
 
 import org.usfirst.frc.team5679.robot.subsystems.DriveTrain;
@@ -33,6 +34,7 @@ public class Robot extends IterativeRobot {
 
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
+	boolean runOnce = true;
 	
 	boolean busy = false;
 	/**
@@ -43,31 +45,67 @@ public class Robot extends IterativeRobot {
     	rightEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
     	leftEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
 
-    	sw.start();
+		SmartDashboard.putString("robot init", "robot init");
     }
     
     /**
      * This function sets up any necessary data before the autonomous control loop.
      */
     public void autonomousinit() {
-    			
+
+		SmartDashboard.putString("autonomous init", "autonomous init");
 	}
 
     /**
      * This function is called periodically during autonomous control
      */
     public void autonomousPeriodic() {
-    	Encoder encoder = new Encoder(1,2,false,EncodingType.k4X);
-    	double distance = encoder.getDistance();
-    	DriveTrain train = new DriveTrain();
-    	while(sw.getElapsedTimeSecs() < 1){
-    		SmartDashboard.putNumber("Distance", distance);
-    		
-    		leftie0.set(.2);
+//    	Encoder encoder = new Encoder(1,2,false,EncodingType.k4X);
+//    	double distance = encoder.getDistance();
+//    	DriveTrain train = new DriveTrain();
+
+    	try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	if(runOnce)
+    	{
+    		sw.start();
+    		runOnce = false;
+        	leftie0.set(.2);
             leftie1.set(.2);
-            rightie0.set(.2);
-            rightie1.set(.2);
-    	}
+            rightie0.set(-.2);
+            rightie1.set(-.2); 
+    	}   	
+    	
+        
+        try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		SmartDashboard.putNumber("stopwatch", sw.getElapsedTime());
+//    	if(sw.getElapsedTime() < 2000){
+//    		SmartDashboard.putString("loop status", "running");
+//
+//    		leftie0.set(-.2);
+//            leftie1.set(-.2);
+//            rightie0.set(.2);
+//            rightie1.set(.2);            
+//
+//    		SmartDashboard.putString("loop status", "running");
+//    	}
+		SmartDashboard.putString("loop status", "stopped");
+		
+		leftie0.set(0);
+        leftie1.set(0);
+        rightie0.set(0);
+        rightie1.set(0); 
     }
 
     /**
@@ -88,6 +126,10 @@ public class Robot extends IterativeRobot {
         leftie1.set(LP);
         rightie0.set(RP);
         rightie1.set(RP); 
+        
+
+        SmartDashboard.putNumber("Operator Left", LP);
+        SmartDashboard.putNumber("Operator Right", RP);
         
         SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
         SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());
