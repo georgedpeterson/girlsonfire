@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.LinkedList;
 /**
@@ -25,13 +26,18 @@ public class Robot extends IterativeRobot {
 	Talon uppieDownie1=new Talon(5);
 	Joystick wibblyWobbly=new Joystick(0);
 	
+
+	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
+	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
+	
 	boolean busy = false;
 	/**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
-
+    	rightEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
+    	leftEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
     }
     
     /**
@@ -50,8 +56,6 @@ public class Robot extends IterativeRobot {
 //    	while(distance < 5){
 //         	System.out.println(distance);
 //    	}
-    	
-    	
     }
 
     /**
@@ -71,18 +75,10 @@ public class Robot extends IterativeRobot {
         leftie0.set(LP);
         leftie1.set(LP);
         rightie0.set(RP);
-        rightie1.set(RP);
+        rightie1.set(RP); 
         
-        
-        boolean stop = false;
-        
-        while(!stop) {
-        	for(int i = 0; i <= 11; i++) {
-        		if(wibblyWobbly.getRawButton(i)) {
-            		System.out.println("Button " + i + " pressed");        			
-        		}
-        	}
-        }
+        SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+        SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());
     }
     
     /**
