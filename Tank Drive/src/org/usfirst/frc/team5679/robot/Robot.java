@@ -7,8 +7,9 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.LinkedList;
+
+import org.usfirst.frc.team5679.robot.subsystems.DriveTrain;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -16,6 +17,8 @@ import java.util.LinkedList;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
+
+
 public class Robot extends IterativeRobot {
 
 	Talon leftie0=new Talon(2);
@@ -25,7 +28,8 @@ public class Robot extends IterativeRobot {
 	Talon uppieDownie0=new Talon(4);
 	Talon uppieDownie1=new Talon(5);
 	Joystick wibblyWobbly=new Joystick(0);
-	
+
+	StopWatch sw = new StopWatch();
 
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
@@ -38,6 +42,8 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
     	rightEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
     	leftEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
+
+    	sw.start();
     }
     
     /**
@@ -51,11 +57,17 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during autonomous control
      */
     public void autonomousPeriodic() {
-//    	Encoder encoder = new Encoder(1,2,false,EncodingType.k4X);
-//    	double distance = encoder.getDistance();
-//    	while(distance < 5){
-//         	System.out.println(distance);
-//    	}
+    	Encoder encoder = new Encoder(1,2,false,EncodingType.k4X);
+    	double distance = encoder.getDistance();
+    	DriveTrain train = new DriveTrain();
+    	while(sw.getElapsedTimeSecs() < 1){
+    		SmartDashboard.putNumber("Distance", distance);
+    		
+    		leftie0.set(.2);
+            leftie1.set(.2);
+            rightie0.set(.2);
+            rightie1.set(.2);
+    	}
     }
 
     /**
