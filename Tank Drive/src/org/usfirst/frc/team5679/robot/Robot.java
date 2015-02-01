@@ -34,7 +34,9 @@ public class Robot extends IterativeRobot {
 
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
+	
 	boolean runOnce = true;
+	boolean reverse = false;
 	
 	boolean busy = false;
 	/**
@@ -42,10 +44,14 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-    	rightEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
-    	leftEncoder.setDistancePerPulse(Math.PI * 0.5 * 360);
+    	// 
+    	rightEncoder.setDistancePerPulse(Math.PI * .5/250);
+    	leftEncoder.setDistancePerPulse(Math.PI * .5/250);
 
 		SmartDashboard.putString("robot init", "robot init");
+		
+		rightEncoder.reset();
+		leftEncoder.reset();
     }
     
     /**
@@ -75,21 +81,59 @@ public class Robot extends IterativeRobot {
     	{
     		sw.start();
     		runOnce = false;
-        	leftie0.set(.2);
+        	leftie0.set(.4);
+            leftie1.set(.4);
+            rightie0.set(-.4);
+            rightie1.set(-.4);	
+    	}   
+    	
+    	if (!reverse && (rightEncoder.getDistance() >= 1.5 || leftEncoder.getDistance() >=1.5)) {  
+            leftie0.set(.2);
             leftie1.set(.2);
             rightie0.set(-.2);
             rightie1.set(-.2); 
-    	}   	
+    	}
     	
-        
-        try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	if (!reverse && (rightEncoder.getDistance() >= 3 || leftEncoder.getDistance() >=3)) {  
+            leftie0.set(-.4);
+            leftie1.set(-.4);
+            rightie0.set(.4);
+            rightie1.set(.4);             
 
-		SmartDashboard.putNumber("stopwatch", sw.getElapsedTime());
+            rightEncoder.reset();
+            leftEncoder.reset();
+            
+            rightEncoder.setReverseDirection(true);
+            leftEncoder.setReverseDirection(true);
+            
+            reverse = true;
+        }
+    	
+    	if (reverse && (rightEncoder.getDistance() >= 1.5 || leftEncoder.getDistance() >=1.5)) {
+    		leftie0.set(-.2);
+            leftie1.set(-.2);
+            rightie0.set(.2);
+            rightie1.set(.2); 
+    	}
+    	
+    	if (reverse && (rightEncoder.getDistance() >= 3 || leftEncoder.getDistance() >=3)) {
+    		leftie0.set(0);
+            leftie1.set(0);
+            rightie0.set(0);
+            rightie1.set(0); 
+            
+            reverse = false;
+    	}                  
+    	
+//    	if (leftEncoder.getDistance() >=4  || rightEncoder.getDistance() >=4) {  
+//            leftie0.set(0);
+//            leftie1.set(0);
+//            rightie0.set(0);
+//            rightie1.set(0); 
+//        }
+    	     
+
+//		SmartDashboard.putNumber("stopwatch", sw.getElapsedTime());
 //    	if(sw.getElapsedTime() < 2000){
 //    		SmartDashboard.putString("loop status", "running");
 //
@@ -100,14 +144,11 @@ public class Robot extends IterativeRobot {
 //
 //    		SmartDashboard.putString("loop status", "running");
 //    	}
-		SmartDashboard.putString("loop status", "stopped");
+        SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+        SmartDashboard.putNumber("Left Encoder",-1 * leftEncoder.getDistance());
 		
-		leftie0.set(0);
-        leftie1.set(0);
-        rightie0.set(0);
-        rightie1.set(0); 
     }
-
+    
     /**
      * This function is called periodically during operator control
      */
@@ -132,7 +173,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("Operator Right", RP);
         
         SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-        SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());
+        SmartDashboard.putNumber("Left Encoder",-1 * leftEncoder.getDistance());
     }
     
     /**
