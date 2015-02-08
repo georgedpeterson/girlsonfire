@@ -1,9 +1,6 @@
 
 package org.usfirst.frc.team5679.robot;
 
-import org.usfirst.frc.team5679.robot.commands.LowerClaw;
-import org.usfirst.frc.team5679.robot.commands.RaiseClaw;
-
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -49,9 +46,6 @@ public class Robot extends IterativeRobot {
 	static final double Kp = 1.0;
 	
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
-	
-	RaiseClaw raiseClaw = new RaiseClaw(.5);
-	LowerClaw lowerClaw = new LowerClaw(-.5);
 	
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
