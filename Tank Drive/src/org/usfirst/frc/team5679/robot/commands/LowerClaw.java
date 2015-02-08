@@ -1,16 +1,17 @@
 package org.usfirst.frc.team5679.robot.commands;
+
 /**
  * 
- * Handles raising the claw.
+ * Handles Lowering the claw.
  *
  */
-public class RaiseClaw extends CommandBase {
+public class LowerClaw extends CommandBase {
 	double speed;
 	
-	// Constructor.
-	public RaiseClaw(double speed) {
-		if (speed <= 0) {
-			throw new IllegalArgumentException("Speed must be positive to move up.");
+	// Constructor
+	public LowerClaw(double speed) {
+		if (speed >= 0) {
+			throw new IllegalArgumentException("Speed must be negative to move down.");
 		}
 		requires(claw);
 		this.speed = speed;
@@ -25,13 +26,13 @@ public class RaiseClaw extends CommandBase {
 	// Executes the movement.
 	@Override
 	public void execute() {
-		claw.clawUp(speed);
+		claw.clawDown(speed);
 	}
-	
+
 	// Returns whether the movement is finished.
 	@Override
 	public boolean isFinished() {
-		return claw.isUpperLimit();
+		return claw.isLowerLimit();
 	}
 
 	// Ends the movement.

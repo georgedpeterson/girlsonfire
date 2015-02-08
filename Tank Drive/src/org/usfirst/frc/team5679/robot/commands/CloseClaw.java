@@ -1,22 +1,19 @@
 package org.usfirst.frc.team5679.robot.commands;
+
 /**
  * 
- * Handles raising the claw.
+ * Handles closing the claw.
  *
  */
-public class RaiseClaw extends CommandBase {
-	double speed;
+public class CloseClaw extends CommandBase {
+	boolean isFinished = false;
 	
 	// Constructor.
-	public RaiseClaw(double speed) {
-		if (speed <= 0) {
-			throw new IllegalArgumentException("Speed must be positive to move up.");
-		}
+	public CloseClaw() {
 		requires(claw);
-		this.speed = speed;
 	}
 	
-	// Initializes the class.
+	// Initializes the movement.
 	@Override
 	protected void initialize() {
 
@@ -25,24 +22,27 @@ public class RaiseClaw extends CommandBase {
 	// Executes the movement.
 	@Override
 	public void execute() {
-		claw.clawUp(speed);
+		claw.clawClose();
+		this.isFinished = true;
 	}
-	
+
 	// Returns whether the movement is finished.
 	@Override
 	public boolean isFinished() {
-		return claw.isUpperLimit();
+		return this.isFinished;
 	}
 
 	// Ends the movement.
 	@Override
 	public void end() {
 		claw.clawStop();
+		this.isFinished = true;
 	}
 
 	// Interrupts the movement.
 	@Override
 	public void interrupted() {
 		end();
+		this.isFinished = true;
 	}
 }
