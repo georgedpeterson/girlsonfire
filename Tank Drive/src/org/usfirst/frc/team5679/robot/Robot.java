@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PIDSource.PIDSourceParameter;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
@@ -78,6 +79,8 @@ public class Robot extends IterativeRobot {
 
 		SmartDashboard.putString("autonomous init", "autonomous init");
 		gyro.reset();
+		gyro.setSensitivity(.007);
+		gyro.setPIDSourceParameter(PIDSourceParameter.kAngle);
 	} 
 
     /**
