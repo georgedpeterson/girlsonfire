@@ -99,12 +99,12 @@ public class Robot extends IterativeRobot {
 //				break;
 			case 1:
 				nextStep = moveCarriage(.1);
-			case 2:
-				nextStep = controlClaw(true);
-				break;
-			case 3:
-				nextStep = controlClaw(false);
-				break;
+//			case 2:
+//				nextStep = controlClaw(true);
+//				break;
+//			case 3:
+//				nextStep = controlClaw(false);
+//				break;
 		}
 	    
 		if (nextStep) {
@@ -151,25 +151,39 @@ public class Robot extends IterativeRobot {
      * This function is for moving the carriage.
      */
     public boolean moveCarriage (double speed){
+    	SmartDashboard.putString("Function", "Entered moveCarriage");
     	boolean moveValid = true;
-        if(speed > 0 && !limitSwitchTop.get())
+    	SmartDashboard.putBoolean("limitSwitchTop", limitSwitchTop.get());
+    	SmartDashboard.putBoolean("limitSwitchBottom", limitSwitchBottom.get());
+    	
+        if(speed > 0 && limitSwitchTop.get())
         {
+        	SmartDashboard.putString("Function", "speed > 0");
         	moveValid = false;
-        }else if (speed < 0 && !limitSwitchBottom.get())
+        }else if (speed < 0 && limitSwitchBottom.get())
         {
+        	SmartDashboard.putString("Function", "speed < 0");
         	moveValid = false;
         }
         
+        Thread.sleep(1000);
+        
         if(moveValid)
         {
+        	SmartDashboard.putString("Function", "Setting Speed");
         	uppieDownie0.set(speed);
         	uppieDownie1.set(speed);
         }else
         {
+        	SmartDashboard.putString("Function", "Setting Speed to 0");
         	uppieDownie0.set(0);  
             uppieDownie1.set(0); 
         }
         
+        Thread.sleep(1000);
+        
+        SmartDashboard.putBoolean("moveValid", moveValid);
+        SmartDashboard.putString("Function", "Leaving moveCarriage");
         return !moveValid;
     }
     
@@ -210,10 +224,10 @@ public class Robot extends IterativeRobot {
         	UD=0;
         } 
         
-        if(UD > 0 && !limitSwitchTop.get())
+        if(UD > 0 && limitSwitchTop.get())
         {
         	moveValid = false;
-        }else if (UD < 0 && !limitSwitchBottom.get())
+        }else if (UD < 0 && limitSwitchBottom.get())
         {
         	moveValid = false;
         }
