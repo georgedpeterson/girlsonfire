@@ -166,7 +166,12 @@ public class Robot extends IterativeRobot {
         	moveValid = false;
         }
         
-        Thread.sleep(1000);
+        try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         if(moveValid)
         {
@@ -180,7 +185,12 @@ public class Robot extends IterativeRobot {
             uppieDownie1.set(0); 
         }
         
-        Thread.sleep(1000);
+        try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         SmartDashboard.putBoolean("moveValid", moveValid);
         SmartDashboard.putString("Function", "Leaving moveCarriage");
