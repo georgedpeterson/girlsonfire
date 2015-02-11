@@ -44,7 +44,7 @@ public class Robot extends IterativeRobot {
 	
 	Gyro gyro = new Gyro(0);
 	double startingAngle = 0;
-	static final double Kp = 1.0;
+	static final double Kp = .03;
 	
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
 	
