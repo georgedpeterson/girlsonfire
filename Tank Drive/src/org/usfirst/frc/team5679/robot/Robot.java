@@ -55,6 +55,7 @@ public class Robot extends IterativeRobot {
 	boolean reverse = false;
 	
 	int stepToPerform = 0;
+	double speedFactor = 0.5;
 	
 	/**
      * This function is run when the robot is first started up and should be
@@ -92,13 +93,13 @@ public class Robot extends IterativeRobot {
 		
 		switch(stepToPerform) {
 			case 0: 
-				nextStep = moveBase(2, .2, angle);
+				nextStep = moveBase(2, .05, angle);
 				break;
 //			case 1:
 //				nextStep = turnBase(.1, 359);
 //				break;
-			case 1:
-				nextStep = moveCarriage(.1);
+//			case 1:
+//				nextStep = moveCarriage(.1);
 //			case 2:
 //				nextStep = controlClaw(true);
 //				break;
@@ -220,7 +221,6 @@ public class Robot extends IterativeRobot {
         boolean clawButton = wibblyWobblyCarriage.getRawButton(1);
         boolean moveValid = true;
 
-		drive.tankDrive(LP, RP);
         
         if(Math.abs(LP)<.1){
         	LP=0;
@@ -229,6 +229,8 @@ public class Robot extends IterativeRobot {
 	        	RP=0;
 	        }
         }
+        
+        setRobotDriveSpeed(drive, LP, RP);
         
         if(Math.abs(UD)<.1){
         	UD=0;
@@ -244,12 +246,12 @@ public class Robot extends IterativeRobot {
         
         if(moveValid)
         {
-        	uppieDownie0.set(UD);
-        	uppieDownie1.set(UD);
+        	setCANTalonSpeed(uppieDownie0,UD);
+        	setCANTalonSpeed(uppieDownie1,UD);
         }else
         {
-        	uppieDownie0.set(0);  
-            uppieDownie1.set(0); 
+        	setCANTalonSpeed(uppieDownie0,0);  
+            setCANTalonSpeed(uppieDownie1,0); 
         }
         
         if (clawButton) {
@@ -278,4 +280,27 @@ public class Robot extends IterativeRobot {
     
     }
     
+    /**
+     * This method sets the speed and applies the limiting speed factor for CANTalons
+     * @param motor
+     * @param speed
+     */
+    //TODO: ADD ACCELERATION CODE
+    public void setCANTalonSpeed(CANTalon motor, double speed)
+    {
+    	motor.set(speed * speedFactor);
+    }
+    
+    /**
+     * This method sets the speed and applies the limiting speed factor for robot Tank Drive
+     * @param driveTrain
+     * @param leftSpeed
+     * @param rightSpeed
+     */
+    //TODO: ADD ACCELERATION CODE
+    public void setRobotDriveSpeed(RobotDrive driveTrain, double leftSpeed, double rightSpeed)
+    {
+    	driveTrain.tankDrive(leftSpeed * speedFactor, rightSpeed * speedFactor);
+    	
+    }
 }
