@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 		
 		switch(stepToPerform) {
 			case 0: 
-				nextStep = moveBase(2, .05, angle);
+				nextStep = moveBase(2, .1, angle);
 				break;
 //			case 1:
 //				nextStep = turnBase(.1, 359);
