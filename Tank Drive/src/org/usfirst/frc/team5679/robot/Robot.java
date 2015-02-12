@@ -91,7 +91,7 @@ public class Robot extends IterativeRobot
 		// nextStep = turnBase(.1, 359);
 		// break;
 		 case 1:
-		 nextStep = moveCarriage(0.1);
+		 nextStep = moveCarriage(0.3);
 		 break;
 		// case 2:
 		// nextStep = controlClaw(true);
