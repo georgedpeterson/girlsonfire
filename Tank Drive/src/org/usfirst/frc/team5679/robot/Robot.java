@@ -85,20 +85,26 @@ public class Robot extends IterativeRobot
 
 		switch (stepToPerform) {
 		case 0:
-			nextStep = moveBase(2, 0.3, 0);
+			nextStep = moveBase(0.5, 0.3, 0);
 			break;
-		// case 1:
-		// nextStep = turnBase(.1, 359);
-		// break;
+//		 case 1:
+//			 nextStep = moveCarriage(0.3);
+//		 	 break;
+//		 case 2:
+//			 nextStep = moveCarriage(-0.3);
+//			 break;
 		 case 1:
-		 nextStep = moveCarriage(0.3);
-		 break;
-		// case 2:
-		// nextStep = controlClaw(true);
-		// break;
-		// case 3:
-		// nextStep = controlClaw(false);
-		// break;
+			 nextStep = controlClaw(true);
+			 try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 break;
+		 case 2:
+			 nextStep = controlClaw(false);
+			 break;
 		}
 
 		if (nextStep) {
@@ -146,45 +152,22 @@ public class Robot extends IterativeRobot
 	 * This function is for moving the carriage.
 	 */
 	public boolean moveCarriage(double speed) {
-		SmartDashboard.putString("Function", "Entered moveCarriage");
 		boolean moveValid = true;
-		SmartDashboard.putBoolean("limitSwitchTop", limitSwitchTop.get());
-		SmartDashboard.putBoolean("limitSwitchBottom", limitSwitchBottom.get());
 
 		if (speed > 0 && limitSwitchTop.get()) {
-			SmartDashboard.putString("Function", "speed > 0");
 			moveValid = false;
 		} else if (speed < 0 && limitSwitchBottom.get()) {
-			SmartDashboard.putString("Function", "speed < 0");
 			moveValid = false;
-		}
-
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		if (moveValid) {
-			SmartDashboard.putString("Function", "Setting Speed");
 			uppieDownie0.set(speed);
 			uppieDownie1.set(speed);
 		} else {
-			SmartDashboard.putString("Function", "Setting Speed to 0");
 			uppieDownie0.set(0);
 			uppieDownie1.set(0);
 		}
 
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		SmartDashboard.putBoolean("moveValid", moveValid);
-		SmartDashboard.putString("Function", "Leaving moveCarriage");
 		return !moveValid;
 	}
 
@@ -193,9 +176,11 @@ public class Robot extends IterativeRobot
 	 */
 	public boolean controlClaw(boolean open) {
 		if (open) {
+SmartDashboard.putBoolean("Claw Open", open);
 			clawRelay.set(Relay.Value.kForward);
 			return true;
 		} else {
+			SmartDashboard.putBoolean("Claw close", open);
 			clawRelay.set(Relay.Value.kOff);
 			return true;
 		}
