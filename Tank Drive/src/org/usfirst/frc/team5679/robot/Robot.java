@@ -44,7 +44,7 @@ public class Robot extends IterativeRobot {
 	
 	Gyro gyro = new Gyro(0);
 	double startingAngle = 0;
-	static final double Kp = .03;
+	static final double Kp = .02;
 	
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
 	
@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 		
 		switch(stepToPerform) {
 			case 0: 
-				nextStep = moveBase(2, .1, angle);
+				nextStep = moveBase(2, .3, angle);
 				break;
 //			case 1:
 //				nextStep = turnBase(.1, 359);
