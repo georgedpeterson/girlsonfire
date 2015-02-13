@@ -28,8 +28,8 @@ public class Robot extends IterativeRobot
 	Talon 		leftie1 				= new Talon(3);
 	Talon 		rightie0 				= new Talon(0);
 	Talon 		rightie1 				= new Talon(1);
-	CANTalon 	uppieDownie0 			= new CANTalon(2);
-	CANTalon	clawMotor				= new CANTalon(3);
+	CANTalon 	uppieDownie0 			= new CANTalon(3);
+	CANTalon	clawMotor				= new CANTalon(2);
 	Joystick 	wibblyWobblyDrive 		= new Joystick(0);
 	Joystick 	wibblyWobblyCarriage 	= new Joystick(1);
 	RobotDrive drive = new RobotDrive(leftie0, leftie1, rightie0, rightie1);
@@ -41,7 +41,7 @@ public class Robot extends IterativeRobot
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
 	Encoder clawEncoder = new Encoder(6, 7, false, EncodingType.k4X);
-	int clawEncoderPulses = 100;
+	int clawEncoderPulses = 10000;
 	
 	static final double startingAngle = 0;
 	static final double Kp = .02;
@@ -105,9 +105,11 @@ public class Robot extends IterativeRobot
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			 SmartDashboard.putNumber("Opening Claw", clawEncoder.get());
 			 break;
 		 case 2:
 			 nextStep = controlClaw(false);
+			 SmartDashboard.putNumber("Closing Claw", clawEncoder.get());
 			 break;
 		}
 
