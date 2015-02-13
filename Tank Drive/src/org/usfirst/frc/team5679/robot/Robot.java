@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDSource.PIDSourceParameter;
-import edu.wpi.first.wpilibj.Relay;
+//import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,25 +28,28 @@ public class Robot extends IterativeRobot
 	Talon 		leftie1 				= new Talon(3);
 	Talon 		rightie0 				= new Talon(0);
 	Talon 		rightie1 				= new Talon(1);
-	CANTalon 	uppieDownie0 			= new CANTalon(2);
-	CANTalon 	uppieDownie1 			= new CANTalon(3);
+	CANTalon 	uppieDownie0 			= new CANTalon(3);
+	CANTalon	clawMotor				= new CANTalon(2);
 	Joystick 	wibblyWobblyDrive 		= new Joystick(0);
 	Joystick 	wibblyWobblyCarriage 	= new Joystick(1);
 	RobotDrive drive = new RobotDrive(leftie0, leftie1, rightie0, rightie1);
 	DigitalInput limitSwitchTop = new DigitalInput(4);
 	DigitalInput limitSwitchBottom = new DigitalInput(5);
-	Relay clawRelay = new Relay(0);
+//	Relay clawRelay = new Relay(0);
 	Gyro gyro = new Gyro(0);
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
+	Encoder clawEncoder = new Encoder(6, 7, false, EncodingType.k4X);
+	int clawEncoderPulses = 10000;
 	
 	static final double startingAngle = 0;
 	static final double Kp = .02;
-	static final double speedFactor = 1;
+	static final double speedFactor = .5;
 	boolean runOnce = true;
 	boolean reverse = false;
 	int stepToPerform = 0;
+	boolean isClawOpen = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -61,6 +64,7 @@ public class Robot extends IterativeRobot
 
 		rightEncoder.reset();
 		leftEncoder.reset();
+		clawEncoder.reset();
 
 	}
 
@@ -110,12 +114,23 @@ public class Robot extends IterativeRobot
 		if (nextStep) {
 			stepToPerform++;
 		}
-
-		SmartDashboard.putNumber("Angle", angle);
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-		SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());
+		
+		debug();
 	}
 
+	public void debug(){
+		SmartDashboard.putNumber("AccelX", accel.getX());
+		SmartDashboard.putNumber("AccelY", accel.getY());
+		SmartDashboard.putNumber("AccelZ", accel.getZ());
+		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
+		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
+		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+		SmartDashboard
+				.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
+		SmartDashboard.putNumber("clawEncoder", clawEncoder.get());
+	}
+	
+	
 	/**
 	 * This function is for moving forward a set number of feet. Returns a
 	 * boolean indicating whether the movement is complete.
@@ -162,10 +177,8 @@ public class Robot extends IterativeRobot
 
 		if (moveValid) {
 			uppieDownie0.set(speed);
-			uppieDownie1.set(speed);
 		} else {
 			uppieDownie0.set(0);
-			uppieDownie1.set(0);
 		}
 
 		return !moveValid;
@@ -174,16 +187,30 @@ public class Robot extends IterativeRobot
 	/**
 	 * This function is for opening and closing the claw.
 	 */
+	//TODO check that it's moving the correct direction and that the pulses returned are correct
 	public boolean controlClaw(boolean open) {
 		if (open) {
-SmartDashboard.putBoolean("Claw Open", open);
-			clawRelay.set(Relay.Value.kForward);
-			return true;
-		} else {
-			SmartDashboard.putBoolean("Claw close", open);
-			clawRelay.set(Relay.Value.kOff);
-			return true;
-		}
+			if (clawEncoder.get() >= Math.abs(clawEncoderPulses)&& isClawOpen) {
+				setCANTalonSpeed(clawMotor, 0);
+				clawEncoder.reset();
+				isClawOpen = true;
+				return true;
+			} else {
+				setCANTalonSpeed(clawMotor, 0.1);
+				return false;
+			}
+		}else
+		{
+			if (clawEncoder.get() >= Math.abs(clawEncoderPulses)&& !isClawOpen){
+				setCANTalonSpeed(clawMotor, 0);
+				clawEncoder.reset();
+				isClawOpen = false;
+				return true;
+			} else {
+				setCANTalonSpeed(clawMotor, -0.1);
+				return false;
+			}
+		}	
 	}
 
 	/**
@@ -218,30 +245,21 @@ SmartDashboard.putBoolean("Claw Open", open);
 
 		if (moveValid) {
 			setCANTalonSpeed(uppieDownie0, UD);
-			setCANTalonSpeed(uppieDownie1, UD);
 		} else {
 			setCANTalonSpeed(uppieDownie0, 0);
-			setCANTalonSpeed(uppieDownie1, 0);
 		}
 
 		if (clawButton) {
-			clawRelay.set(Relay.Value.kForward);
+			controlClaw(true);
 		} else {
-			clawRelay.set(Relay.Value.kOff);
+			controlClaw(false);
 		}
 
-		SmartDashboard.putNumber("AccelX", accel.getX());
-		SmartDashboard.putNumber("AccelY", accel.getY());
-		SmartDashboard.putNumber("AccelZ", accel.getZ());
 		SmartDashboard.putBoolean("Claw Button", clawButton);
-		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
-		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
 		SmartDashboard.putBoolean("Move Valid", moveValid);
 		SmartDashboard.putNumber("Operator UpDown", UD);
-
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-		SmartDashboard
-				.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
+		
+		debug();
 	}
 
 	/**
