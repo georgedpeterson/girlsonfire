@@ -40,8 +40,8 @@ public class Robot extends IterativeRobot
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
-	Encoder clawEncoder = new Encoder(6, 7, false, EncodingType.k4X);
-	int clawEncoderPulses = 10000;
+	Encoder clawEncoder = new Encoder(6, 7, false, EncodingType.k1X);
+	int clawEncoderPulses = 124;
 	
 	static final double startingAngle = 0;
 	static final double Kp = .02;
@@ -192,24 +192,24 @@ public class Robot extends IterativeRobot
 	//TODO check that it's moving the correct direction and that the pulses returned are correct
 	public boolean controlClaw(boolean open) {
 		if (open) {
-			if (clawEncoder.get() >= Math.abs(clawEncoderPulses)&& isClawOpen) {
+			if (Math.abs(clawEncoder.get()) >= clawEncoderPulses || isClawOpen) {
 				setCANTalonSpeed(clawMotor, 0);
 				clawEncoder.reset();
 				isClawOpen = true;
 				return true;
 			} else {
-				setCANTalonSpeed(clawMotor, 0.1);
+				setCANTalonSpeed(clawMotor, 1);
 				return false;
 			}
 		}else
 		{
-			if (clawEncoder.get() >= Math.abs(clawEncoderPulses)&& !isClawOpen){
+			if (Math.abs(clawEncoder.get()) >= clawEncoderPulses + 12 || !isClawOpen){
 				setCANTalonSpeed(clawMotor, 0);
 				clawEncoder.reset();
 				isClawOpen = false;
 				return true;
 			} else {
-				setCANTalonSpeed(clawMotor, -0.1);
+				setCANTalonSpeed(clawMotor, -1);
 				return false;
 			}
 		}	
@@ -253,14 +253,16 @@ public class Robot extends IterativeRobot
 
 		if (clawButton) {
 			controlClaw(true);
+			 SmartDashboard.putNumber("Opening Claw", clawEncoder.get());
 		} else {
 			controlClaw(false);
+			 SmartDashboard.putNumber("Closing Claw", clawEncoder.get());
 		}
 
 		SmartDashboard.putBoolean("Claw Button", clawButton);
 		SmartDashboard.putBoolean("Move Valid", moveValid);
 		SmartDashboard.putNumber("Operator UpDown", UD);
-		
+		SmartDashboard.putBoolean("Claw State", isClawOpen);
 		debug();
 	}
 
