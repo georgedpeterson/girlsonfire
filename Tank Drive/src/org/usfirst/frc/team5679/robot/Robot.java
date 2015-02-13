@@ -29,8 +29,7 @@ public class Robot extends IterativeRobot
 	Talon 		rightie0 				= new Talon(0);
 	Talon 		rightie1 				= new Talon(1);
 	CANTalon 	uppieDownie0 			= new CANTalon(2);
-	CANTalon 	uppieDownie1 			= new CANTalon(3);
-	CANTalon	clawMotor				= new CANTalon(4);
+	CANTalon	clawMotor				= new CANTalon(3);
 	Joystick 	wibblyWobblyDrive 		= new Joystick(0);
 	Joystick 	wibblyWobblyCarriage 	= new Joystick(1);
 	RobotDrive drive = new RobotDrive(leftie0, leftie1, rightie0, rightie1);
@@ -41,8 +40,7 @@ public class Robot extends IterativeRobot
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
-	//TODO: Make sure these ports and values are correct
-	Encoder clawEncoder = new Encoder(4, 5, false, EncodingType.k4X);
+	Encoder clawEncoder = new Encoder(6, 7, false, EncodingType.k4X);
 	int clawEncoderPulses = 100;
 	
 	static final double startingAngle = 0;
@@ -51,6 +49,7 @@ public class Robot extends IterativeRobot
 	boolean runOnce = true;
 	boolean reverse = false;
 	int stepToPerform = 0;
+	boolean isClawOpen = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -65,6 +64,7 @@ public class Robot extends IterativeRobot
 
 		rightEncoder.reset();
 		leftEncoder.reset();
+		clawEncoder.reset();
 
 	}
 
@@ -114,12 +114,23 @@ public class Robot extends IterativeRobot
 		if (nextStep) {
 			stepToPerform++;
 		}
-
-		SmartDashboard.putNumber("Angle", angle);
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-		SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());
+		
+		debug();
 	}
 
+	public void debug(){
+		SmartDashboard.putNumber("AccelX", accel.getX());
+		SmartDashboard.putNumber("AccelY", accel.getY());
+		SmartDashboard.putNumber("AccelZ", accel.getZ());
+		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
+		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
+		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+		SmartDashboard
+				.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
+		SmartDashboard.putNumber("clawEncoder", clawEncoder.get());
+	}
+	
+	
 	/**
 	 * This function is for moving forward a set number of feet. Returns a
 	 * boolean indicating whether the movement is complete.
@@ -166,10 +177,8 @@ public class Robot extends IterativeRobot
 
 		if (moveValid) {
 			uppieDownie0.set(speed);
-			uppieDownie1.set(speed);
 		} else {
 			uppieDownie0.set(0);
-			uppieDownie1.set(0);
 		}
 
 		return !moveValid;
@@ -181,20 +190,24 @@ public class Robot extends IterativeRobot
 	//TODO check that it's moving the correct direction and that the pulses returned are correct
 	public boolean controlClaw(boolean open) {
 		if (open) {
-			if (clawEncoder.get() >= clawEncoderPulses) {
+			if (clawEncoder.get() >= Math.abs(clawEncoderPulses)&& isClawOpen) {
 				setCANTalonSpeed(clawMotor, 0);
+				clawEncoder.reset();
+				isClawOpen = true;
 				return true;
 			} else {
-				setCANTalonSpeed(clawMotor, 1);
+				setCANTalonSpeed(clawMotor, 0.1);
 				return false;
 			}
 		}else
 		{
-			if (clawEncoder.get() >= clawEncoderPulses) {
+			if (clawEncoder.get() >= Math.abs(clawEncoderPulses)&& !isClawOpen){
 				setCANTalonSpeed(clawMotor, 0);
+				clawEncoder.reset();
+				isClawOpen = false;
 				return true;
 			} else {
-				setCANTalonSpeed(clawMotor, -1);
+				setCANTalonSpeed(clawMotor, -0.1);
 				return false;
 			}
 		}	
@@ -232,30 +245,21 @@ public class Robot extends IterativeRobot
 
 		if (moveValid) {
 			setCANTalonSpeed(uppieDownie0, UD);
-			setCANTalonSpeed(uppieDownie1, UD);
 		} else {
 			setCANTalonSpeed(uppieDownie0, 0);
-			setCANTalonSpeed(uppieDownie1, 0);
 		}
 
 		if (clawButton) {
-			controlClaw(false);
-		} else {
 			controlClaw(true);
+		} else {
+			controlClaw(false);
 		}
 
-		SmartDashboard.putNumber("AccelX", accel.getX());
-		SmartDashboard.putNumber("AccelY", accel.getY());
-		SmartDashboard.putNumber("AccelZ", accel.getZ());
 		SmartDashboard.putBoolean("Claw Button", clawButton);
-		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
-		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
 		SmartDashboard.putBoolean("Move Valid", moveValid);
 		SmartDashboard.putNumber("Operator UpDown", UD);
-
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-		SmartDashboard
-				.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
+		
+		debug();
 	}
 
 	/**
