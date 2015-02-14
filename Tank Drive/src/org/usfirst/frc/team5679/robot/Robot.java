@@ -47,6 +47,7 @@ public class Robot extends IterativeRobot
 	static final double startingAngle = 0;
 	static final double Kp = .02;
 	static final double speedFactor = .5;
+	double speedAdjust = 1;
 	boolean runOnce = true;
 	boolean reverse = false;
 	int stepToPerform = 0;
@@ -243,7 +244,11 @@ public class Robot extends IterativeRobot
 		boolean moveValidCarriage = true;
 		boolean moveValidClaw = true;
 
-
+		if(driveJoystick.getTrigger())
+			speedAdjust = 0.5;
+		else
+			speedAdjust = 1;
+		
 		if (Math.abs(LP) < .1) {
 			LP = 0;
 
@@ -252,7 +257,7 @@ public class Robot extends IterativeRobot
 			}
 		}
 
-		setRobotDriveSpeed(drive, LP, RP);
+		setRobotDriveSpeed(drive, LP * speedAdjust, RP * speedAdjust);
 
 		//Carriage Control
 		if (Math.abs(UD) < .4) {
