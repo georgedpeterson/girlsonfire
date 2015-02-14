@@ -89,7 +89,7 @@ public class Robot extends IterativeRobot
 
 		switch (stepToPerform) {
 		case 0:
-			nextStep = moveBase(0.5, 0.3, 0);
+			nextStep = moveBase(0.5, 0.6, 0);
 			break;
 		case 1:
 			nextStep = controlClaw(.6);
@@ -243,16 +243,17 @@ public class Robot extends IterativeRobot
 		double clawControl = carriageJoystick.getRawAxis(3);
 		boolean moveValidCarriage = true;
 		boolean moveValidClaw = true;
+		double speedAdj = driveJoystick.getThrottle();
 
-		if(driveJoystick.getTrigger())
-			speedAdjust = 0.5;
+		if(Math.abs(driveJoystick.getThrottle()) > .2)
+			speedAdjust = 0.7;
 		else
 			speedAdjust = 1;
 		
-		if (Math.abs(LP) < .1) {
+		if (Math.abs(LP) < 0.1) {
 			LP = 0;
 
-			if (Math.abs(RP) < .1) {
+			if (Math.abs(RP) < 0.1) {
 				RP = 0;
 			}
 		}
@@ -260,7 +261,7 @@ public class Robot extends IterativeRobot
 		setRobotDriveSpeed(drive, LP * speedAdjust, RP * speedAdjust);
 
 		//Carriage Control
-		if (Math.abs(UD) < .4) {
+		if (Math.abs(UD) < 0.3) {
 			UD = 0;
 		}
 
