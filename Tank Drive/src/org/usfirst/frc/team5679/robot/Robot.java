@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDSource.PIDSourceParameter;
-//import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,26 +23,26 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot 
 {
-	Talon 		leftie0 				= new Talon(2);
-	Talon 		leftie1 				= new Talon(3);
-	Talon 		rightie0 				= new Talon(0);
-	Talon 		rightie1 				= new Talon(1);
-	CANTalon 	uppieDownie0 			= new CANTalon(3);
+	Talon 		leftMotor0 				= new Talon(2);
+	Talon 		leftMotor1 				= new Talon(3);
+	Talon 		rightMotor0 			= new Talon(0);
+	Talon 		rightMotor1 			= new Talon(1);
+	CANTalon 	carriageMotor 			= new CANTalon(3);
 	CANTalon	clawMotor				= new CANTalon(2);
-	Joystick 	wibblyWobblyDrive 		= new Joystick(0);
-	Joystick 	wibblyWobblyCarriage 	= new Joystick(1);
-	RobotDrive drive = new RobotDrive(leftie0, leftie1, rightie0, rightie1);
+	Joystick 	driveJoystick 			= new Joystick(0);
+	Joystick 	carriageJoystick 		= new Joystick(1);
+	RobotDrive drive = new RobotDrive(leftMotor0, leftMotor1, rightMotor0, rightMotor1);
 	DigitalInput limitSwitchTop = new DigitalInput(4);
 	DigitalInput limitSwitchBottom = new DigitalInput(5);
 	DigitalInput limitSwitchOpen = new DigitalInput(8);
 	DigitalInput limitSwitchClosed = new DigitalInput(9);
-//	Relay clawRelay = new Relay(0);
 	Gyro gyro = new Gyro(0);
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
-	Encoder clawEncoder = new Encoder(6, 7, false, EncodingType.k1X);
-	int clawEncoderPulses = 124;
+	//encoder is not being used but is wired up
+	//	Encoder clawEncoder = new Encoder(6, 7, false, EncodingType.k1X);
+	//	int clawEncoderPulses = 124;
 	
 	static final double startingAngle = 0;
 	static final double Kp = .02;
@@ -57,7 +56,6 @@ public class Robot extends IterativeRobot
 	 * used for any initialization code.
 	 */
 	public void robotInit() {
-		//
 		rightEncoder.setDistancePerPulse(Math.PI * .5 / 250);
 		leftEncoder.setDistancePerPulse(Math.PI * .5 / 250);
 
@@ -65,7 +63,7 @@ public class Robot extends IterativeRobot
 
 		rightEncoder.reset();
 		leftEncoder.reset();
-		clawEncoder.reset();
+//		clawEncoder.reset();
 
 	}
 
@@ -85,33 +83,56 @@ public class Robot extends IterativeRobot
 	 * This function is called periodically during autonomous control
 	 */
 	public void autonomousPeriodic() {
-		double angle = gyro.getAngle();
+//		double angle = gyro.getAngle();
 		boolean nextStep = false;
 
 		switch (stepToPerform) {
 		case 0:
 			nextStep = moveBase(0.5, 0.3, 0);
 			break;
-//		 case 1:
-//			 nextStep = moveCarriage(0.3);
-//		 	 break;
-//		 case 2:
-//			 nextStep = moveCarriage(-0.3);
-//			 break;
-//		 case 1:
-//			 nextStep = controlClaw(true);
-//			 try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			 SmartDashboard.putNumber("Opening Claw", clawEncoder.get());
-//			 break;
-//		 case 2:
-//			 nextStep = controlClaw(false);
-//			 SmartDashboard.putNumber("Closing Claw", clawEncoder.get());
-//			 break;
+		case 1:
+			nextStep = controlClaw(.6);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			controlClaw(0);
+			break;
+		case 2:
+			nextStep = moveCarriage(-0.5);
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			moveCarriage(0);
+		 	break;
+		case 3:
+			nextStep = moveCarriage(0.5);
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			moveCarriage(0);
+		 	break;
+		case 4:
+			nextStep = turnBase(0.5, 90);
+			break;
+		case 5:
+			nextStep = controlClaw(-.6);
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			controlClaw(0);
+			break;
 		}
 
 		if (nextStep) {
@@ -128,13 +149,11 @@ public class Robot extends IterativeRobot
 //		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
 //		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
 //		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-//		SmartDashboard
-//				.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
+//		SmartDashboard.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
 //		SmartDashboard.putNumber("clawEncoder", clawEncoder.get());
-		SmartDashboard.putNumber("Claw 3 Value", wibblyWobblyCarriage.getRawAxis(3));
-		SmartDashboard.putBoolean("Claw Open Limit", limitSwitchOpen.get());
-		SmartDashboard.putBoolean("Claw Close Limit", limitSwitchClosed.get());
-
+//		SmartDashboard.putNumber("Claw 3 Value", carriageJoystick.getRawAxis(3));
+//		SmartDashboard.putBoolean("Claw Open Limit", limitSwitchOpen.get());
+//		SmartDashboard.putBoolean("Claw Close Limit", limitSwitchClosed.get());
 	}
 	
 	
@@ -183,9 +202,9 @@ public class Robot extends IterativeRobot
 		}
 
 		if (moveValid) {
-			uppieDownie0.set(speed);
+			carriageMotor.set(speed);
 		} else {
-			uppieDownie0.set(0);
+			carriageMotor.set(0);
 		}
 
 		return !moveValid;
@@ -217,10 +236,10 @@ public class Robot extends IterativeRobot
 	 * This function is called periodically during operator control
 	 */
 	public void teleopPeriodic() {
-		double LP = -wibblyWobblyDrive.getRawAxis(1);
-		double RP = -wibblyWobblyDrive.getRawAxis(5);
-		double UD = wibblyWobblyCarriage.getRawAxis(1);
-		double clawControl = wibblyWobblyCarriage.getRawAxis(3);
+		double LP = -driveJoystick.getRawAxis(1);
+		double RP = -driveJoystick.getRawAxis(5);
+		double UD = carriageJoystick.getRawAxis(1);
+		double clawControl = carriageJoystick.getRawAxis(3);
 		boolean moveValidCarriage = true;
 		boolean moveValidClaw = true;
 
@@ -247,9 +266,9 @@ public class Robot extends IterativeRobot
 		}
 
 		if (moveValidCarriage) {
-			setCANTalonSpeed(uppieDownie0, UD);
+			setCANTalonSpeed(carriageMotor, UD);
 		} else {
-			setCANTalonSpeed(uppieDownie0, 0);
+			setCANTalonSpeed(carriageMotor, 0);
 		}
 		
 		//Claw Control
@@ -268,7 +287,6 @@ public class Robot extends IterativeRobot
 		} else {
 			setCANTalonSpeed(clawMotor, 0);
 		}
-		debug();
 	}
 
 	/**
