@@ -35,6 +35,8 @@ public class Robot extends IterativeRobot
 	RobotDrive drive = new RobotDrive(leftie0, leftie1, rightie0, rightie1);
 	DigitalInput limitSwitchTop = new DigitalInput(4);
 	DigitalInput limitSwitchBottom = new DigitalInput(5);
+	DigitalInput limitSwitchOpen = new DigitalInput(8);
+	DigitalInput limitSwitchClosed = new DigitalInput(9);
 //	Relay clawRelay = new Relay(0);
 	Gyro gyro = new Gyro(0);
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
@@ -49,7 +51,6 @@ public class Robot extends IterativeRobot
 	boolean runOnce = true;
 	boolean reverse = false;
 	int stepToPerform = 0;
-	boolean isClawOpen = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -97,20 +98,20 @@ public class Robot extends IterativeRobot
 //		 case 2:
 //			 nextStep = moveCarriage(-0.3);
 //			 break;
-		 case 1:
-			 nextStep = controlClaw(true);
-			 try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			 SmartDashboard.putNumber("Opening Claw", clawEncoder.get());
-			 break;
-		 case 2:
-			 nextStep = controlClaw(false);
-			 SmartDashboard.putNumber("Closing Claw", clawEncoder.get());
-			 break;
+//		 case 1:
+//			 nextStep = controlClaw(true);
+//			 try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			 SmartDashboard.putNumber("Opening Claw", clawEncoder.get());
+//			 break;
+//		 case 2:
+//			 nextStep = controlClaw(false);
+//			 SmartDashboard.putNumber("Closing Claw", clawEncoder.get());
+//			 break;
 		}
 
 		if (nextStep) {
@@ -121,15 +122,19 @@ public class Robot extends IterativeRobot
 	}
 
 	public void debug(){
-		SmartDashboard.putNumber("AccelX", accel.getX());
-		SmartDashboard.putNumber("AccelY", accel.getY());
-		SmartDashboard.putNumber("AccelZ", accel.getZ());
-		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
-		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-		SmartDashboard
-				.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
-		SmartDashboard.putNumber("clawEncoder", clawEncoder.get());
+//		SmartDashboard.putNumber("AccelX", accel.getX());
+//		SmartDashboard.putNumber("AccelY", accel.getY());
+//		SmartDashboard.putNumber("AccelZ", accel.getZ());
+//		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
+//		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
+//		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+//		SmartDashboard
+//				.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
+//		SmartDashboard.putNumber("clawEncoder", clawEncoder.get());
+		SmartDashboard.putNumber("Claw 3 Value", wibblyWobblyCarriage.getRawAxis(3));
+		SmartDashboard.putBoolean("Claw Open Limit", limitSwitchOpen.get());
+		SmartDashboard.putBoolean("Claw Close Limit", limitSwitchClosed.get());
+
 	}
 	
 	
@@ -190,29 +195,22 @@ public class Robot extends IterativeRobot
 	 * This function is for opening and closing the claw.
 	 */
 	//TODO check that it's moving the correct direction and that the pulses returned are correct
-	public boolean controlClaw(boolean open) {
-		if (open) {
-			if (Math.abs(clawEncoder.get()) >= clawEncoderPulses || isClawOpen) {
-				setCANTalonSpeed(clawMotor, 0);
-				clawEncoder.reset();
-				isClawOpen = true;
-				return true;
-			} else {
-				setCANTalonSpeed(clawMotor, 1);
-				return false;
-			}
-		}else
-		{
-			if (Math.abs(clawEncoder.get()) >= clawEncoderPulses + 12 || !isClawOpen){
-				setCANTalonSpeed(clawMotor, 0);
-				clawEncoder.reset();
-				isClawOpen = false;
-				return true;
-			} else {
-				setCANTalonSpeed(clawMotor, -1);
-				return false;
-			}
-		}	
+	public boolean controlClaw(double speed) {
+		boolean moveValid = true;
+
+		if (speed > 0 && limitSwitchOpen.get()) {
+			moveValid = false;
+		} else if (speed < 0 && limitSwitchClosed.get()) {
+			moveValid = false;
+		}
+
+		if (moveValid) {
+			clawMotor.set(speed);
+		} else {
+			clawMotor.set(0);
+		}
+
+		return !moveValid;
 	}
 
 	/**
@@ -222,8 +220,10 @@ public class Robot extends IterativeRobot
 		double LP = -wibblyWobblyDrive.getRawAxis(1);
 		double RP = -wibblyWobblyDrive.getRawAxis(5);
 		double UD = wibblyWobblyCarriage.getRawAxis(1);
-		boolean clawButton = wibblyWobblyCarriage.getRawButton(1);
-		boolean moveValid = true;
+		double clawControl = wibblyWobblyCarriage.getRawAxis(3);
+		boolean moveValidCarriage = true;
+		boolean moveValidClaw = true;
+
 
 		if (Math.abs(LP) < .1) {
 			LP = 0;
@@ -235,34 +235,39 @@ public class Robot extends IterativeRobot
 
 		setRobotDriveSpeed(drive, LP, RP);
 
-		if (Math.abs(UD) < .1) {
+		//Carriage Control
+		if (Math.abs(UD) < .4) {
 			UD = 0;
 		}
 
 		if (UD > 0 && limitSwitchTop.get()) {
-			moveValid = false;
+			moveValidCarriage = false;
 		} else if (UD < 0 && limitSwitchBottom.get()) {
-			moveValid = false;
+			moveValidCarriage = false;
 		}
 
-		if (moveValid) {
+		if (moveValidCarriage) {
 			setCANTalonSpeed(uppieDownie0, UD);
 		} else {
 			setCANTalonSpeed(uppieDownie0, 0);
 		}
-
-		if (clawButton) {
-			controlClaw(true);
-			 SmartDashboard.putNumber("Opening Claw", clawEncoder.get());
-		} else {
-			controlClaw(false);
-			 SmartDashboard.putNumber("Closing Claw", clawEncoder.get());
+		
+		//Claw Control
+		if (Math.abs(clawControl) < .4) {
+			clawControl = 0;
 		}
 
-		SmartDashboard.putBoolean("Claw Button", clawButton);
-		SmartDashboard.putBoolean("Move Valid", moveValid);
-		SmartDashboard.putNumber("Operator UpDown", UD);
-		SmartDashboard.putBoolean("Claw State", isClawOpen);
+		if (clawControl > 0 && limitSwitchOpen.get()) {
+			moveValidClaw = false;
+		} else if (clawControl < 0 && limitSwitchClosed.get()) {
+			moveValidClaw = false;
+		}
+
+		if (moveValidClaw) {
+			setCANTalonSpeed(clawMotor, clawControl);
+		} else {
+			setCANTalonSpeed(clawMotor, 0);
+		}
 		debug();
 	}
 
@@ -270,14 +275,13 @@ public class Robot extends IterativeRobot
 	 * This function is called periodically during test mode
 	 */
 	public void testPeriodic() {
-
 	}
 
 	/**
 	 * This method sets the speed and applies the limiting speed factor for
 	 * CANTalons
 	 * 
-	 * @param motor
+	 * @param motorkkk  x lo
 	 * @param speed
 	 */
 	// TODO: ADD ACCELERATION CODE
