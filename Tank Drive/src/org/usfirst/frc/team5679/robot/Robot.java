@@ -248,7 +248,7 @@ public class Robot extends IterativeRobot
 		boolean moveValidClaw = true;
 		double speedAdj = driveJoystick.getThrottle();
 
-		if(Math.abs(driveJoystick.getThrottle()) > .2)
+		if(Math.abs(driveJoystick.getThrottle()) > .1)
 			speedAdjust = 1;
 		else
 			speedAdjust = .7;
