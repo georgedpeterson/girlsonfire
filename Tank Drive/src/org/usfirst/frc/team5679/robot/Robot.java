@@ -91,41 +91,44 @@ public class Robot extends IterativeRobot
 		boolean nextStep = false;
 
 		switch (stepToPerform) {
+//		case 0:
+//			nextStep = moveBase(2, 0.5, 0);
+//			break;
+//		case 1:
+//			nextStep = controlClaw(.6);
+//			try {
+//				Thread.sleep(2000);
+//			} catch (InterruptedException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//			controlClaw(0);
+//			break;
+//		case 1:
+//			nextStep = moveCarriage(-0.5);
+//			try {
+//				Thread.sleep(3000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			moveCarriage(0);
+//		 	break;
+//		case 2:
+//			nextStep = moveCarriage(0.5);
+//			try {
+//				Thread.sleep(3000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			moveCarriage(0);
+//		 	break;
 		case 0:
-			nextStep = moveBase(5, 0.5, 0);
+			nextStep = turnBase(.6, 90);
 			break;
 		case 1:
-			nextStep = controlClaw(.6);
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			controlClaw(0);
-			break;
-		case 2:
-			nextStep = moveCarriage(-0.5);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			moveCarriage(0);
-		 	break;
-		case 3:
-			nextStep = moveCarriage(0.5);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			moveCarriage(0);
-		 	break;
-		case 4:
-			nextStep = turnBase(0.5, 90);
+			nextStep = turnBase(.6, 180);
 			break;
 //		case 5:
 //			nextStep = controlClaw(-.6);
@@ -188,7 +191,7 @@ public class Robot extends IterativeRobot
 			drive.tankDrive(speed, -speed * driveOffset);
 			return false;
 		} else {
-			moveBase(0, 0, 0);
+			drive.tankDrive(0, 0);;
 			return true;
 		}
 	}
