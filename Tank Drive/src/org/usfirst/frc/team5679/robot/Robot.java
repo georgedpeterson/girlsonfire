@@ -248,10 +248,10 @@ public class Robot extends IterativeRobot
 		boolean moveValidClaw = true;
 		double speedAdj = driveJoystick.getThrottle();
 
-		if(driveJoystick.getThrottle() > 0.2)
+		if(driveJoystick.getRawAxis(3) > 0.2)
 			speedAdjust = 1;
-		else if(driveJoystick.getThrottle() < -0.2)
-			speedAdjust = .4;
+		else if(driveJoystick.getRawAxis(2) > 0.2)
+			speedAdjust = .5;
 		else
 			speedAdjust = .7;
 		
