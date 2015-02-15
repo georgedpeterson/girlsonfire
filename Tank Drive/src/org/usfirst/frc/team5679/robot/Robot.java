@@ -93,49 +93,49 @@ public class Robot extends IterativeRobot
 		case 0:
 			nextStep = moveBase(0.5, 0.6, 0);
 			break;
-		case 1:
-			nextStep = controlClaw(.6);
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			controlClaw(0);
-			break;
-		case 2:
-			nextStep = moveCarriage(-0.5);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			moveCarriage(0);
-		 	break;
-		case 3:
-			nextStep = moveCarriage(0.5);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			moveCarriage(0);
-		 	break;
-		case 4:
-			nextStep = turnBase(0.5, 90);
-			break;
-		case 5:
-			nextStep = controlClaw(-.6);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			controlClaw(0);
-			break;
+//		case 1:
+//			nextStep = controlClaw(.6);
+//			try {
+//				Thread.sleep(2000);
+//			} catch (InterruptedException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//			controlClaw(0);
+//			break;
+//		case 2:
+//			nextStep = moveCarriage(-0.5);
+//			try {
+//				Thread.sleep(3000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			moveCarriage(0);
+//		 	break;
+//		case 3:
+//			nextStep = moveCarriage(0.5);
+//			try {
+//				Thread.sleep(3000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			moveCarriage(0);
+//		 	break;
+//		case 4:
+//			nextStep = turnBase(0.5, 90);
+//			break;
+//		case 5:
+//			nextStep = controlClaw(-.6);
+//			try {
+//				Thread.sleep(3000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			controlClaw(0);
+//			break;
 		}
 
 		if (nextStep) {
@@ -167,10 +167,10 @@ public class Robot extends IterativeRobot
 	public boolean moveBase(double feet, double speed, double angle) {
 		if (rightEncoder.getDistance() >= feet
 				|| leftEncoder.getDistance() >= feet) {
-			drive.drive(0, 0);
+			drive.arcadeDrive(0, 0);
 			return true;
 		} else {
-			drive.drive(speed, angle * Kp);
+			drive.arcadeDrive(speed,0);
 			return false;
 		}
 	}
