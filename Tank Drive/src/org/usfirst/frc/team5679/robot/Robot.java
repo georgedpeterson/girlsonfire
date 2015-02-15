@@ -53,6 +53,7 @@ public class Robot extends IterativeRobot
 	boolean runOnce = true;
 	boolean reverse = false;
 	int stepToPerform = 0;
+	static final double driveOffset = .9;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -93,39 +94,39 @@ public class Robot extends IterativeRobot
 		case 0:
 			nextStep = moveBase(5, 0.5, 0);
 			break;
-//		case 1:
-//			nextStep = controlClaw(.6);
-//			try {
-//				Thread.sleep(2000);
-//			} catch (InterruptedException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//			controlClaw(0);
-//			break;
-//		case 2:
-//			nextStep = moveCarriage(-0.5);
-//			try {
-//				Thread.sleep(3000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			moveCarriage(0);
-//		 	break;
-//		case 3:
-//			nextStep = moveCarriage(0.5);
-//			try {
-//				Thread.sleep(3000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			moveCarriage(0);
-//		 	break;
-//		case 4:
-//			nextStep = turnBase(0.5, 90);
-//			break;
+		case 1:
+			nextStep = controlClaw(.6);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			controlClaw(0);
+			break;
+		case 2:
+			nextStep = moveCarriage(-0.5);
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			moveCarriage(0);
+		 	break;
+		case 3:
+			nextStep = moveCarriage(0.5);
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			moveCarriage(0);
+		 	break;
+		case 4:
+			nextStep = turnBase(0.5, 90);
+			break;
 //		case 5:
 //			nextStep = controlClaw(-.6);
 //			try {
@@ -167,10 +168,10 @@ public class Robot extends IterativeRobot
 	public boolean moveBase(double feet, double speed, double angle) {
 		if (rightEncoder.getDistance() >= feet
 				|| leftEncoder.getDistance() >= feet) {
-			drive.arcadeDrive(0, 0);
+			drive.tankDrive(0, 0);
 			return true;
 		} else {
-			drive.arcadeDrive(speed,0);
+			drive.tankDrive(speed, speed * driveOffset);
 			return false;
 		}
 	}
@@ -184,7 +185,7 @@ public class Robot extends IterativeRobot
 		double angleDifference = currentAngle - startingAngle;
 		if ((angleDifference > 0 && angleDifference <= desiredAngle)
 				|| (angleDifference < 0 && angleDifference >= desiredAngle)) {
-			moveBase(0, speed, desiredAngle);
+			drive.tankDrive(speed, -speed * driveOffset);
 			return false;
 		} else {
 			moveBase(0, 0, 0);
