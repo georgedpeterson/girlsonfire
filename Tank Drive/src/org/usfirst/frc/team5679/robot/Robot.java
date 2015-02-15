@@ -46,7 +46,7 @@ public class Robot extends IterativeRobot
 	
 	static final double startingAngle = 0;
 	static final double Kp = .02;
-	static final double speedFactor = .5;
+	static final double speedFactor = 1;
 	double speedAdjust = 1;
 	boolean runOnce = true;
 	boolean reverse = false;
