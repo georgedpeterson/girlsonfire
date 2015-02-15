@@ -47,6 +47,8 @@ public class Robot extends IterativeRobot
 	static final double startingAngle = 0;
 	static final double Kp = .02;
 	static final double speedFactor = 1;
+	static final double clawSpeedFactor = .5;
+	static final double carriageSpeedFactor = .6;
 	double speedAdjust = 1;
 	boolean runOnce = true;
 	boolean reverse = false;
@@ -217,7 +219,7 @@ public class Robot extends IterativeRobot
 	//TODO check that it's moving the correct direction and that the pulses returned are correct
 	public boolean controlClaw(double speed) {
 		boolean moveValid = true;
-
+		
 		if (speed > 0 && limitSwitchOpen.get()) {
 			moveValid = false;
 		} else if (speed < 0 && limitSwitchClosed.get()) {
@@ -226,6 +228,7 @@ public class Robot extends IterativeRobot
 
 		if (moveValid) {
 			clawMotor.set(speed);
+			SmartDashboard.putNumber("Claw Speed", speed);
 		} else {
 			clawMotor.set(0);
 		}
@@ -246,9 +249,9 @@ public class Robot extends IterativeRobot
 		double speedAdj = driveJoystick.getThrottle();
 
 		if(Math.abs(driveJoystick.getThrottle()) > .2)
-			speedAdjust = 0.7;
-		else
 			speedAdjust = 1;
+		else
+			speedAdjust = .7;
 		
 		if (Math.abs(LP) < 0.1) {
 			LP = 0;
@@ -265,6 +268,8 @@ public class Robot extends IterativeRobot
 			UD = 0;
 		}
 
+		UD = UD * carriageSpeedFactor;
+		
 		if (UD > 0 && limitSwitchTop.get()) {
 			moveValidCarriage = false;
 		} else if (UD < 0 && limitSwitchBottom.get()) {
@@ -278,10 +283,12 @@ public class Robot extends IterativeRobot
 		}
 		
 		//Claw Control
-		if (Math.abs(clawControl) < .4) {
+		if (Math.abs(clawControl) < .3) {
 			clawControl = 0;
 		}
 
+	clawControl =	clawControl * clawSpeedFactor;
+		
 		if (clawControl > 0 && limitSwitchOpen.get()) {
 			moveValidClaw = false;
 		} else if (clawControl < 0 && limitSwitchClosed.get()) {
