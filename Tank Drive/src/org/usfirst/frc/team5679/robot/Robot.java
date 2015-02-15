@@ -91,7 +91,7 @@ public class Robot extends IterativeRobot
 
 		switch (stepToPerform) {
 		case 0:
-			nextStep = moveBase(0.5, 0.6, 0);
+			nextStep = moveBase(5, 0.5, 0);
 			break;
 //		case 1:
 //			nextStep = controlClaw(.6);
