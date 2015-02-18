@@ -81,6 +81,7 @@ public class Robot extends IterativeRobot
 		gyro.reset();
 		gyro.setSensitivity(.007);
 		gyro.setPIDSourceParameter(PIDSourceParameter.kAngle);
+		stepToPerform = 0;
 	}
 
 	/**
@@ -91,9 +92,9 @@ public class Robot extends IterativeRobot
 		boolean nextStep = false;
 
 		switch (stepToPerform) {
-//		case 0:
-//			nextStep = moveBase(2, 0.5, 0);
-//			break;
+		case 0:
+			nextStep = moveBase(2, 0.5, 0);
+			break;
 //		case 1:
 //			nextStep = controlClaw(.6);
 //			try {
@@ -124,12 +125,12 @@ public class Robot extends IterativeRobot
 //			}
 //			moveCarriage(0);
 //		 	break;
-		case 0:
-			nextStep = turnBase(.6, 90);
-			break;
-		case 1:
-			nextStep = turnBase(.6, 180);
-			break;
+//		case 0:
+//			nextStep = turnBase(.6, 90);
+//			break;
+//		case 1:
+//			nextStep = turnBase(.6, 180);
+//			break;
 //		case 5:
 //			nextStep = controlClaw(-.6);
 //			try {
@@ -250,7 +251,6 @@ public class Robot extends IterativeRobot
 		double clawControl = carriageJoystick.getRawAxis(3);
 		boolean moveValidCarriage = true;
 		boolean moveValidClaw = true;
-		double speedAdj = driveJoystick.getThrottle();
 
 		if(driveJoystick.getRawAxis(3) > 0.2)
 			speedAdjust = 1;
