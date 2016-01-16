@@ -1,14 +1,14 @@
 package org.usfirst.frc.team5679.robot;
 
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PIDSource.PIDSourceParameter;
+import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,7 +36,7 @@ public class Robot extends IterativeRobot
 	DigitalInput limitSwitchBottom = new DigitalInput(5);
 	DigitalInput limitSwitchOpen = new DigitalInput(8);
 	DigitalInput limitSwitchClosed = new DigitalInput(9);
-	Gyro gyro = new Gyro(0);
+	AnalogGyro gyro = new AnalogGyro(0);
 	BuiltInAccelerometer accel = new BuiltInAccelerometer();
 	Encoder rightEncoder = new Encoder(0, 1, false, EncodingType.k4X);
 	Encoder leftEncoder = new Encoder(2, 3, false, EncodingType.k4X);
@@ -80,7 +80,7 @@ public class Robot extends IterativeRobot
 		SmartDashboard.putString("autonomous init", "autonomous init");
 		gyro.reset();
 		gyro.setSensitivity(.007);
-		gyro.setPIDSourceParameter(PIDSourceParameter.kAngle);
+		gyro.setPIDSourceType(PIDSourceType.kRate);
 	}
 
 	/**
@@ -91,9 +91,9 @@ public class Robot extends IterativeRobot
 		boolean nextStep = false;
 
 		switch (stepToPerform) {
-//		case 0:
-//			nextStep = moveBase(2, 0.5, 0);
-//			break;
+		case 0:
+			nextStep = moveBase(10, 0.5, 0);
+			break;
 //		case 1:
 //			nextStep = controlClaw(.6);
 //			try {
@@ -124,12 +124,12 @@ public class Robot extends IterativeRobot
 //			}
 //			moveCarriage(0);
 //		 	break;
-		case 0:
-			nextStep = turnBase(.6, 90);
-			break;
-		case 1:
-			nextStep = turnBase(.6, 180);
-			break;
+//		case 0:
+//			nextStep = turnBase(.6, 90);
+//			break;
+//		case 1:
+//			nextStep = turnBase(.6, 180);
+//			break;
 //		case 5:
 //			nextStep = controlClaw(-.6);
 //			try {
@@ -150,17 +150,19 @@ public class Robot extends IterativeRobot
 	}
 
 	public void debug(){
-//		SmartDashboard.putNumber("AccelX", accel.getX());
-//		SmartDashboard.putNumber("AccelY", accel.getY());
-//		SmartDashboard.putNumber("AccelZ", accel.getZ());
-//		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
-//		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
-//		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-//		SmartDashboard.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
+		SmartDashboard.putNumber("AccelX", accel.getX());
+		SmartDashboard.putNumber("AccelY", accel.getY());
+		SmartDashboard.putNumber("AccelZ", accel.getZ());
+		SmartDashboard.putNumber("Joystick x", driveJoystick.getX());
+		SmartDashboard.putNumber("Joystick y", driveJoystick.getY());
+		SmartDashboard.putBoolean("Upper Limit", limitSwitchTop.get());
+		SmartDashboard.putBoolean("Lower Limit", limitSwitchBottom.get());
+		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+		SmartDashboard.putNumber("Left Encoder", -1 * leftEncoder.getDistance());
 //		SmartDashboard.putNumber("clawEncoder", clawEncoder.get());
-//		SmartDashboard.putNumber("Claw 3 Value", carriageJoystick.getRawAxis(3));
-//		SmartDashboard.putBoolean("Claw Open Limit", limitSwitchOpen.get());
-//		SmartDashboard.putBoolean("Claw Close Limit", limitSwitchClosed.get());
+		SmartDashboard.putNumber("Claw 3 Value", carriageJoystick.getRawAxis(1));
+		SmartDashboard.putBoolean("Claw Open Limit", limitSwitchOpen.get());
+		SmartDashboard.putBoolean("Claw Close Limit", limitSwitchClosed.get());
 	}
 	
 	
@@ -306,6 +308,8 @@ public class Robot extends IterativeRobot
 		} else {
 			setCANTalonSpeed(clawMotor, 0);
 		}
+		
+		debug();
 	}
 
 	/**
